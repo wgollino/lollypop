@@ -186,7 +186,7 @@ class Radios(GObject.GObject):
         result = sql.execute("SELECT AVG(popularity) FROM (SELECT popularity "
                              "FROM radios ORDER BY POPULARITY DESC LIMIT 100)")
         v = result.fetchone()
-        if v and v[0] > 5:
+        if v and v[0] is not None and v[0] > 5:
             return v[0]
         return 5
 

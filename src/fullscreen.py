@@ -10,7 +10,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, Gdk, GLib
+from gi.repository import Gtk, Gdk, GLib, Gst
 
 from cgi import escape
 from gettext import gettext as _
@@ -149,10 +149,11 @@ class FullScreen(Gtk.Window):
             @param value as int
         """
         if not self._seeking and self._progress.is_visible():
-            if value is None:
-                value = Lp.player.get_position_in_track()/1000000
-            self._progress.set_value(value)
-            self._timelabel.set_text(seconds_to_string(value/60))
+            if value is None and Lp().player.get_status() != Gst.State.PAUSED:
+                value = Lp().player.get_position_in_track()/1000000
+            if value is not None:
+                self._progress.set_value(value)
+                self._timelabel.set_text(seconds_to_string(value/60))
         return True
 
     def _destroy(self, widget):
@@ -319,6 +320,6 @@ class FullScreen(Gtk.Window):
             @param scale as Gtk.Scale, data as unused
         """
         value = scale.get_value()
+        Lp().player.seek(value/60)
         self._seeking = False
         self._update_position(value)
-        Lp.player.seek(value/60)

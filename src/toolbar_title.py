@@ -10,7 +10,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, GLib, Gdk
+from gi.repository import Gtk, GLib, Gdk, Gst
 
 from lollypop.define import Lp, Type
 from lollypop.pop_slider import SliderPopover
@@ -59,10 +59,11 @@ class ToolbarTitle(Gtk.Bin):
             @param value as int
         """
         if not self._seeking:
-            if value is None:
+            if value is None and Lp.player.get_status() != Gst.State.PAUSED:
                 value = Lp.player.get_position_in_track()/1000000
-            self._progress.set_value(value)
-            self._timelabel.set_text(seconds_to_string(value/60))
+            if value is not None:
+                self._progress.set_value(value)
+                self._timelabel.set_text(seconds_to_string(value/60))
         return True
 
     def on_current_changed(self, player):
@@ -161,6 +162,6 @@ class ToolbarTitle(Gtk.Bin):
             @param event as Gdk.Event
         """
         value = scale.get_value()
+        Lp.player.seek(value/60)
         self._seeking = False
         self.update_position(value)
-        Lp.player.seek(value/60)

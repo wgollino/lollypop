@@ -113,6 +113,9 @@ class SelectionList(Gtk.ScrolledWindow):
         self.add(self._view)
         self.get_vadjustment().connect('value_changed', self._on_scroll)
 
+        scrollbar_width = self.get_vscrollbar().get_preferred_width()[0]
+        self._view.set_margin_right(scrollbar_width)
+
     def mark_as_artists(self, is_artists):
         """
             Mark list as artists list

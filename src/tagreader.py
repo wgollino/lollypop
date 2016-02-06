@@ -85,16 +85,9 @@ class ScannerTagReader(TagReader):
         """
         if tags is None:
             return _("Unknown")
-        else:
-            artists = ""
 
-        size = tags.get_tag_size('artist')
-        for i in range(0, size):
-            (exist, artist) = tags.get_string_index('artist', i)
-            artists += artist
-            if i < size - 1:
-                artists += ";"
-        return artists
+        artists = self.get_tags_by_name(tags, 'artist')
+        return ';'.join(artists)
 
     def get_artist_sortname(self, tags):
         """
@@ -327,3 +320,23 @@ class ScannerTagReader(TagReader):
             Lp().tracks.add_artist(track_id, artist_id)
         for genre_id in genre_ids:
             Lp().tracks.add_genre(track_id, genre_id)
+
+    def get_tags_by_name(self, tags, name):
+        """
+            Get tag string values matching name
+            @param tags as Gst.TagList
+            @param tag name as string
+            @return [string]
+        """
+        count = 0
+        items = []
+
+        for i in range(tags.n_tags()):
+            if tags.nth_tag_name(i) == name:
+                count += 1
+
+        for i in range(count):
+            value = tags.get_string_index(name, i)[1]
+            items.append(value)
+
+        return items
